@@ -1,0 +1,20 @@
+The following describes the pipeline for the SNP based enrichment analyses (with relevant
+scripts for each part indicated). 
+
+1) Define overlap between PGC SNPs and study SNPs. 
+	1a: Define study proxy SNPs: FindProxySNPs.r
+	1b: Create overlap SNP list: PGCoverlap.r
+
+2) LD pruning supervised by ASD p-value
+	2a: Make genotype files of just overlapped SNPs: PriorityPruner_MakeGenotypes.sh
+	2b: Make input table for PriorityPruner: PriorityPrunerInput.relevant
+	2c: Run PriorityPruner: RunPriorityPruner.sh
+
+3) Limit PGC data to those that survived pruning (i.e. their direct or proxy overlaps did).
+	Annotate SNPs with status as ASD related SNP and meQTL. Count the number of 450k CpG sites within
+	meQTL detection window of each SNP. 
+		Script: AnnotatePGCresults.r
+
+4) Create bins of MAF and number of 450k CpG sites in proximity, and a joint bin of the two to match
+	null set SNPs on. Perform enrichment test across variety of ASD SNP p-values and meQTL p-values. 
+		Script: RunSNPEnrichment.r

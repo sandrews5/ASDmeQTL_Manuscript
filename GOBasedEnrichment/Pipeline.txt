@@ -1,0 +1,16 @@
+The following describes the pipeline for the GO enrichment analyses (with relevant
+scripts for each part indicated). 
+
+1) Create a vector, for peripheral blood, cord blood, and fetal brain, that lists
+	the 450k CpG sites taht were tested in the meQTL analysis. 
+		Script: Define_TestedCpGs.r
+2) Create a vector (in length equal to that generated in Step 1) that is a 0/1 indicator
+	variable stating if that CpG site is an meQTL target. 
+		Script: Define_meQTLtargets.r
+3) Create a final vector (in length equal to that generated in Steps 1&2) that is an 0/1
+	indicator variable stating if that CpG site is a meQTL target downstream of an ASD-related SNP. 
+		Script: Define_ASDmeQTLtargets.r, AddtlObjects.r
+4) Use these 3 vectors to perform GO enrichment at 2 levels:
+	A) meQTL targets against background of all tested CpGs
+	B) meQTL targets downstream of ASD-related SNPs against background of meQTL targets
+		Script: RunGOEnrichment.r

@@ -68,7 +68,7 @@ for (chr in 1:22){
 	#Run through SNPs and find the best proxy for that SNP that is measured in the study population. 
 	collectproxies<-rep(NA,nrow(truncres))
 	for (x in 1:length(thischr)){ #LOOP THROUGH SNAP RESULTS FOR THIS CHR
-		temp<-read.table(paste("/dcs01/arking/arkinglab/shared/PGC_meQTL/PGC_SNPNames/",myfiles[thischr[x]],sep=""),header=TRUE,stringsAsFactors=FALSE) #LOAD SNAP RESULT
+		temp<-read.table(paste("filepath",myfiles[thischr[x]],sep=""),header=TRUE,stringsAsFactors=FALSE) #LOAD SNAP RESULT
 		temp<-temp[-which(temp$Distance==0),] #GET RID OF ROWS WHERE SNP IS PROXY OF ITSELF
 		temp<-temp[which(temp$Proxy%in%SNPgeno[,1]),] #LIMIT TO SNPs THAT ARE ACTUALLY IN OUT STUDY POPULATION
 		PGCproxy[,x]<-truncres$SNP%in%temp$SNP #NOTE IN PGC SNPS WHAT WE HAVE PROXIES FOR

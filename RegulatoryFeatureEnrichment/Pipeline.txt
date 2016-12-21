@@ -1,0 +1,24 @@
+The following describes the pipeline for the regulatory feature enrichment analyses
+(with relevant scripts for each part indicated). 
+
+There are 2 analyses here:
+	Comparison 1: meQTL targets vs. non-meQTL targets
+	Comparison 2: meQTL targets of PGC cross disorder SNPs vs meQTL targets of non PGC cross disorder SNPs. 
+
+#Download regulatory element data:
+	Script: 
+	
+#Comparison 1:
+	Script: RegulatoryEnrichment_Comparison1.r (see comments in scripts for objects generated in other
+		scripts that are used here)
+		
+#Comparison 2:
+	Step 1: Download and format PGC cross-disorder results
+		Script: PGC_CrossDisorder.r
+	Step 2: Find what SNPs used in each tissue dataset overlap with SNPs of suggestive significance from the 
+		PGC cross disorder analysis (or their proxies)
+			Script: PGC_CrossDisorder_PGCOverlap.r
+	Step 3: Find the CpG sites associated with the SNPs identified in Step 2.
+		Script: PGC_CrossDisorder_MappingCpGs.r
+	Step 4: Perform Enrichment analyses
+		Script: RegulatoryEnrichment_Comparison2.r

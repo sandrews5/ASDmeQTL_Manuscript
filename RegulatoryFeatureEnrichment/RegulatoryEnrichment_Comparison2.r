@@ -1,6 +1,15 @@
 #In this script, we will peform an enrichment analysis looking at degree of 
 #overlap with various regulatory features. In this script, the analysis is:
-	#meQTL targets vs. non-meQTL targets
+	#meQTL targets of PGC cross disorder SNPs (or their proxies) vs. non-meQTL targets
+
+#Load list of meQTL targets generated in "PGC_CrossDisorder_MappingCpGs.r"
+#This has 4 elements, meQTL targets of peripheral blood, cord blood, fetal brain, and lung, respctively. 
+#We must also generate the 5th, 6th, and 7th elements to be the overlap between peripheral blood and the 
+#other 3 tissues. 	
+load("/CrossDisorder/taggedcgs_CrossDisorder.rda")
+taggedcgs[[5]]<-taggedcgs[[1]][which(taggedcgs[[1]]%in%taggedcgs[[2]])] #Peripheral blood - cord blood
+taggedcgs[[6]]<-taggedcgs[[1]][which(taggedcgs[[1]]%in%taggedcgs[[3]])] #Peripheral blood - fetal brain
+taggedcgs[[7]]<-taggedcgs[[1]][which(taggedcgs[[1]]%in%taggedcgs[[4]])] #Peripheral blood - lung
 
 #Load the vectors of tested CpG sites generated in '/GOBasedEnrichment/Define_TestedCpGs.r'
 load("testedblood.rda")
@@ -35,7 +44,7 @@ pickcontrols<-list(testedblood,testedcord,testedbrain,testedlung,
 	#5: Peripheral blood downsampled to cord blood, FDR 5% (calculated)
 	#6: Peripheral blood downsampled to fetal brain, as thresholded in fetal brain results
 	#7: Peripheral blood downsampled to lung, FDR 5% (calculated)
- pvaluecutoffs<-c(1E-5,2.7E-6,1E-8,4E-5,2.3E-5,1E-8,2.4E-5)
+pvaluecutoffs<-c(1E-5,2.7E-6,1E-8,4E-5,2.3E-5,1E-8,2.4E-5)
 
 #Initialize and store CpG names for those CpGs associated with SNPs at appropriate p-values cutoffs. 
 mappingcgs.blood<-list()
@@ -85,7 +94,6 @@ remme<-unique(c(polycg$PROBE,probelength$PROBE))
 #a CpG site as not being a meQTL target if it was not a meQTL targe in EITHER tissue. 
 #The end result will be the list 'cacoindicators.strict' which is identical in size to 'pickcontrols'
 #(7 elements, corresponding elements are equal in length). 
-
 cacoindicators.strict<-list()
 grabov<-c(2,3,4)
 count<-1
@@ -117,7 +125,7 @@ for (level in 1:length(totalmappings)){
 		cacoindicators.strict[[level]]<-thenewtested
 	}
 }
-save(cacoindicators.strict,file="/CrossTissue/cacoindicators.strict.rda")
+save(cacoindicators.strict,file="/CrossDisorder/cacoindicators.strict_CrossDisorder.rda")
 
 ####################################################################
 #Actual Enrichment testing
@@ -133,6 +141,11 @@ load("testedcord.rda")
 load("testedbrain.rda")
 load("testedlung.rda")
 
+load("/CrossDisorder/taggedcgs_CrossDisorder.rda")
+taggedcgs[[5]]<-taggedcgs[[1]][which(taggedcgs[[1]]%in%taggedcgs[[2]])] #Peripheral blood - cord blood
+taggedcgs[[6]]<-taggedcgs[[1]][which(taggedcgs[[1]]%in%taggedcgs[[3]])] #Peripheral blood - fetal brain
+taggedcgs[[7]]<-taggedcgs[[1]][which(taggedcgs[[1]]%in%taggedcgs[[4]])] #Peripheral blood - lung
+
 #first points out the locations of different meQTL results, including the 3 downsampled results.  
 first<-c("/SEED_meQTLs/","/EARLI_meQTLs/","fetalbrain","lung","/SEED_DownSample1/","/SEED_DownSample2/","/SEED_DownSample3/")
 #A list of tested CpGs; in the downsampled cases it must be the union (i.e. passed QC in both) of 
@@ -142,7 +155,7 @@ pickcontrols<-list(testedblood,testedcord,testedbrain,testedlung,
 		testedblood[which(testedblood%in%testedbrain)],
 		testedblood[which(testedblood%in%testedlung)])
 
-load("/CrossTissue/cacoindicators.strict.rda")
+load("/CrossDisorder/cacoindicators.strict_CrossDisorder.rda")
 
 #Testing against all DHS as in the manifest. We do this for all 7 types of meQTL targets we want to think about, 
 full.stat<-rep(0,7)
@@ -153,23 +166,24 @@ for(x in 1:7){
 	full<-full[match(complete,full$Name),c("Name","chr","pos","DHS")]
 	full$status<-0
 	full$status[which(full$Name%in%complete[which(cacoindicators.strict[[x]]==1)])]<-1
-	
+	full<-full[which(full$status==1),]
+	full$PSYCH<-full$Name%in%taggedcgs[[x]]
+
 	#Intialize a 2x2 table called mytab which has the follow structure:
 	# 1 0
 	#1
 	#0
 	#Where 1/0 is meant to be an indicator variable. 
-	#We will run a simple fisher's exact test and retain effect size and p-value. 
+	#We will run a simple fisher's exact test and retain effect size and p-value. 	
 	mytab<-matrix(0,2,2)
-	mytab[1,1]<-length(which(full$DHS==TRUE & full$status==1))
-	mytab[1,2]<-length(which(full$DHS==TRUE & full$status==0))
-	mytab[2,1]<-length(which(full$DHS!=TRUE & full$status==1))
-	mytab[2,2]<-length(which(full$DHS!=TRUE & full$status==0))
+	mytab[1,1]<-length(which(full$DHS==TRUE & full$PSYCH==1))
+	mytab[1,2]<-length(which(full$DHS==TRUE & full$PSYCH==0))
+	mytab[2,1]<-length(which(full$DHS!=TRUE & full$PSYCH==1))
+	mytab[2,2]<-length(which(full$DHS!=TRUE & full$PSYCH==0))
 	res<-fisher.test(mytab)
 	full.stat[x]<-res$estimate
 	full.p[x]<-res$p.value
 }
-#Names indicate what meQTl target lists we are testing. 
 names(full.stat)<-names(full.p)<-c("PB","CB","FB","L","PB-CB","PB-FB","PB-L")
 
 library(rtracklayer)
@@ -211,8 +225,9 @@ FunctionalEnrichment<-function(regions,interest,controls,manifest){
 
 #First we'll collect results for the DNaseI HS and the chromatin marks. We run the previously defined
 #function "FunctionalEnrichment" for each site/mark with each definition of meQTL targets. 
-#Cases here are defined as meQTL targets
-#Controls here are defined as non-meQTL targets. 
+#First we limit to only meQTL targets, then we partition as such:
+#Cases here are defined as meQTL targets of PGC cross disorder SNPs or their proxies
+#Controls here are defined as meQTL targets of SNPs that are not PGC cross disorder SNPs or their proxies
 enrichmat<-matrix(0,length(totallist),length(pickcontrols))
 pmat<-matrix(0,length(totallist),length(pickcontrols))
 for(i in 1:length(totallist)){
@@ -221,8 +236,9 @@ for(i in 1:length(totallist)){
 	a<-import.bed(con=totallist[i])
 	thisresult<-unlist(lapply(1:length(pickcontrols),function(x){
 		complete<-pickcontrols[[x]]
-		cases<-complete[which(cacoindicators.strict[[x]]==1)]
-		controls<-complete[which(cacoindicators.strict[[x]]==0)]
+		useonly<-complete[which(cacoindicators.strict[[x]]==1)]
+		cases<-useonly[which(useonly%in%taggedcgs[[x]])]
+		controls<-useonly[which(!useonly%in%taggedcgs[[x]])]
 		return(FunctionalEnrichment(a,cases,controls,manifest))
 	}))
 	enrichmat[i,]<-thisresult[grep("est",names(thisresult))]
@@ -232,30 +248,10 @@ rownames(enrichmat)<-rownames(pmat)<-totallist
 colnames(enrichmat)<-colnames(pmat)<-c("PB","CB","FB","L","PB-CB","PB-FB","PB-L")
 head(enrichmat)
 head(pmat<(0.05/181))
-save(enrichmat,file="enrichmat.rda")
-save(pmat,file="pmat.rda")
+save(enrichmat,file="/CrossDisorder/enrichmat_CrossDisorder.rda")
+save(pmat,file="/CrossDisorder/pmat_CrossDisorder.rda")
 
 #Next we'll collect results for the TFBSs. We run the previously defined
 #function "FunctionalEnrichment" for each site/mark with each definition of meQTL targets. 
 #Cases here are defined as meQTL targets
-#Controls here are defined as non-meQTL targets. 
-tfbs<-import.bed(con="TFBS")
-totalfactors<-unique(tfbs$name)
-enrichmat.tfbs<-matrix(0,length(totalfactors),length(pickcontrols))
-pmat.tfbs<-matrix(0,length(totalfactors),length(pickcontrols))
-for(i in 1:length(totalfactors)){
-	print(i)
-	a<-tfbs[which(tfbs$name==totalfactors[i]),]
-	thisresult<-unlist(lapply(1:length(pickcontrols),function(x){
-		complete<-pickcontrols[[x]]
-		cases<-complete[which(cacoindicators.strict[[x]]==1)] #vector of cg namees
-		controls<-complete[which(cacoindicators.strict[[x]]==0)]  #vector of cg namees
-		return(FunctionalEnrichment(a,cases,controls,manifest))
-	}))
-	enrichmat.tfbs[i,]<-thisresult[grep("est",names(thisresult))]
-	pmat.tfbs[i,]<-thisresult[grep("p",names(thisresult))]
-}
-rownames(enrichmat.tfbs)<-rownames(pmat.tfbs)<-totalfactors
-colnames(enrichmat.tfbs)<-colnames(pmat.tfbs)<-c("PB","CB","FB","L","PB-CB","PB-FB","PB-L")
-save(enrichmat.tfbs,file="enrichmat.tfbs.rda")
-save(pmat.tfbs,file="pmat.tfbs.rda")
+#Controls here are defined as non-meQTL targets.

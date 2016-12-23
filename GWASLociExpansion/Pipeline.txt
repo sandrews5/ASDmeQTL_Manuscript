@@ -1,0 +1,9 @@
+There are 2 main parts to the GWAS loci expansion analysis. 
+
+1) Annotate ASD-related SNPs in PGC with gene and meQTL information across
+	tissue type. Also note the genes implicated by the meQTL targets of these SNPs. 
+		Script: GLE_Annotation.r
+
+2) Visually demonstrate the utility of GWAS loci expansion by plotting
+	meQTLs in gene space across tissue type. 
+		Script: GLE_Plotting.r

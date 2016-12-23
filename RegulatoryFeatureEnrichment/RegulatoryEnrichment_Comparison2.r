@@ -253,5 +253,26 @@ save(pmat,file="/CrossDisorder/pmat_CrossDisorder.rda")
 
 #Next we'll collect results for the TFBSs. We run the previously defined
 #function "FunctionalEnrichment" for each site/mark with each definition of meQTL targets. 
-#Cases here are defined as meQTL targets
-#Controls here are defined as non-meQTL targets.
+#Cases here are defined as meQTL targets of PGC cross disorder SNPs or their proxies
+#Controls here are defined as meQTL targets of SNPs that are not PGC cross disorder SNPs or their proxies
+tfbs<-import.bed(con="TFBS")
+totalfactors<-unique(tfbs$name)
+enrichmat.tfbs<-matrix(0,length(totalfactors),length(pickcontrols))
+pmat.tfbs<-matrix(0,length(totalfactors),length(pickcontrols))
+for(i in 1:length(totalfactors)){
+	print(i)
+	a<-tfbs[which(tfbs$name==totalfactors[i]),]
+	thisresult<-unlist(lapply(1:length(pickcontrols),function(x){
+		complete<-pickcontrols[[x]]
+		useonly<-complete[which(cacoindicators.strict[[x]]==1)]
+		cases<-useonly[which(useonly%in%taggedcgs[[x]])]
+		controls<-useonly[which(!useonly%in%taggedcgs[[x]])]
+		return(FunctionalEnrichment(a,cases,controls,manifest))
+	}))
+	enrichmat.tfbs[i,]<-thisresult[grep("est",names(thisresult))]
+	pmat.tfbs[i,]<-thisresult[grep("p",names(thisresult))]
+}
+rownames(enrichmat.tfbs)<-rownames(pmat.tfbs)<-totalfactors
+colnames(enrichmat.tfbs)<-colnames(pmat.tfbs)<-c("PB","CB","FB","L","PB-CB","PB-FB","PB-L")
+save(enrichmat.tfbs,file="/CrossDisorder/enrichmat.tfbs.rda")
+save(pmat.tfbs,file="/CrossDisorder/pmat.tfbs.rda")

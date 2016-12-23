@@ -4,6 +4,7 @@ Scripts for manuscript "Cross tissue integration of genetic and epigenetic data 
 Now available here: http://biorxiv.org/content/early/2016/12/06/091330
 
 Directory descriptions:
+
 1) meQTLParameters: Implement data-driven procedure to select meQTL query parameters 
 (window size, MAF threshold, DNAM sd threshold) to ensure adequate power for SNP & DNAm data
 		

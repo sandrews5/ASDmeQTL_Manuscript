@@ -65,8 +65,11 @@ load("asdgenelist.rda") #Produced in the script /GOBasedEnrichment/Define_ASDmeQ
 load("object.qnorm_preQC.Batch1.rda")
 pos<-as.numeric(start(object))
 #Load fetal brain meQLT data. 
+windowsize<-1000000
 fetalbrain<-read.csv("All_Imputed_BonfSignificant_mQTLs.csv",header=TRUE)
 fetalbrain<-fetalbrain[which(fetalbrain$SNP_Chr==fetalbrain$DNAm_CHR),]
+fetalbrain$Space<-abs(fetalbrain$SNP_BP-fetalbrain$DNAm_BP)
+fetalbrain<-fetalbrain[which(fetalbrain$Space<=windowsize),]
 #Vector of filepaths delimiting location of meQTL data
 meQTLfilelist<-c("/SEED_meQTLs/","/meQTL_Paper/EARLI_meQTLs/","fetalbrain")
 templabels<-c("BloodmeQTL","CBmeQTL","BrainmeQTL")

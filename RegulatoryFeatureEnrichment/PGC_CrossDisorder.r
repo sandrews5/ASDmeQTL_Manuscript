@@ -17,6 +17,7 @@ library(rtracklayer)
 hg19pos<-read.table("hglft_genome_1ee8_47b450.bed",stringsAsFactors=FALSE)
 hg19pos<-unlist(lapply(hg19pos[,1],function(x){strsplit(x,":")[[1]][2]}))
 hg19pos<-unlist(lapply(hg19pos,function(x){strsplit(x,"-")[[1]][1]}))
+f$pos<-hg19pos
 
 #Remove those positions that failed to map over to new genome coordinates.
 #Label appropriate columns and name them in similar way to PGC ASD result object

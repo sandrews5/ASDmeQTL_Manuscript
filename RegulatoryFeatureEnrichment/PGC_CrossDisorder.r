@@ -1,7 +1,7 @@
 #In this script, we will download and format the PGC cross-disorder results for 
 #further use. 
 
-#These results can be downloaded from here:
+#These results can be downloaded from here: http://www.med.unc.edu/pgc/results-and-downloads
 
 #Set directory and read in results.
 setwd("/CrossDisorder")

@@ -6,7 +6,7 @@ There are 2 analyses here:
 	Comparison 2: meQTL targets of PGC cross disorder SNPs vs meQTL targets of non PGC cross disorder SNPs. 
 
 #Download regulatory element data:
-	Script: 
+	Script: DownloadFunctionalData.sh
 	
 #Comparison 1:
 	Script: RegulatoryEnrichment_Comparison1.r (see comments in scripts for objects generated in other

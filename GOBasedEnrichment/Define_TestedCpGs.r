@@ -32,10 +32,11 @@ chrnames<-as.character(seqnames(object.whites))
 pos<-as.numeric(start(object.whites))
 sdcutoffs<-quantile(rowsds,sdcutoff)
 B<-B[-which(rowsds<sdcutoffs),]
-chrnames<-chrnames[-which(rowsds<sdcutoffs)]
+chrnames<-chrnames[-which(rowsds<sdcutoffs)] 
 pos<-pos[-which(rowsds<sdcutoffs)]
 
-#Load list of probes with annotated SNPs from Chen et al. 2013. These were filtered out in the fetail brain study and so we do that in the 
+#Load list of probes with annotated SNPs from Chen et al. 2013 (http://www.sickkids.ca/Research/Weksberg-Lab/Publications/index.html). 
+#These were filtered out in the fetail brain study and so we do that in the 
 #peripheral blood and cord blood data as well, because we know that these probes can affect enrichment results (see Methods and McClay 2015). 
 	polycg<-read.csv("Chen_PolyCpGandSBE.csv",header=TRUE,stringsAsFactors=FALSE)
 	probelength<-read.csv("Chen_ProbeLength.csv",header=TRUE,stringsAsFactors=FALSE)

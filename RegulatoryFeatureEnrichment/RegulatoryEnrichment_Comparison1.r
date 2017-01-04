@@ -72,8 +72,9 @@ for (chr in 1:22){
 	}
 }
 
-#Load list of probes with annotated SNPs from Chen et al. 2013. These were filtered out in the fetail brain study and so we do that in the 
-#peripheral blood and cord blood data as well, because we know that these probes can affect enrichment results (see Methods and McClay 2015).
+#Load list of probes with annotated SNPs from Chen et al. 2013 (http://www.sickkids.ca/Research/Weksberg-Lab/Publications/index.html)
+#These were filtered out in the fetail brain study and so we do that in the peripheral blood and cord blood data as well, 
+#because we know that these probes can affect enrichment results (see Methods and McClay 2015).
 #We load them here again as a sanity check even though they were used already in producing 'testedxxx'.  
 polycg<-read.csv("Chen_PolyCpGandSBE.csv",header=TRUE,stringsAsFactors=FALSE)
 probelength<-read.csv("Chen_ProbeLength.csv",header=TRUE,stringsAsFactors=FALSE)

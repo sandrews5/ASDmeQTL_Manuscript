@@ -1,7 +1,7 @@
 # ASDmeQTL_Manuscript
 Scripts for manuscript "Cross tissue integration of genetic and epigenetic data offers insight into autism spectrum disorder"
 
-Now available here: http://biorxiv.org/content/early/2016/12/06/091330
+Available here: https://www.nature.com/articles/s41467-017-00868-y
 
 Directory descriptions:
 
